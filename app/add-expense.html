@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Add Expense</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body { background: var(--color-bg); }
+
+    /* ── Top header ── */
+    .page-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      height: 81px;
+      display: flex;
+      align-items: center;
+      padding: 0 235.5px;
+    }
+
+    .page-header__inner {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .page-header__title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--color-text-heading);
+    }
+
+    .close-btn {
+      width: 36px; height: 36px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: var(--radius-btn);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      transition: background 0.15s;
+    }
+    .close-btn:hover { background: rgba(0,0,0,0.05); }
+    .close-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* ── Content ── */
+    .page-content {
+      max-width: 672px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* ── Amount card ── */
+    .amount-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 33px 33px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .amount-card__label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      line-height: 20px;
+    }
+
+    .amount-card__row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .amount-card__currency {
+      font-size: 30px;
+      line-height: 36px;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+      flex-shrink: 0;
+    }
+
+    .amount-card__input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 400;
+      color: var(--color-text-heading);
+      background: transparent;
+      min-width: 0;
+    }
+    .amount-card__input::placeholder { color: var(--color-border-input); }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 14px;
+      color: var(--color-text-heading);
+      margin-bottom: 12px;
+    }
+
+    /* ── Description field ── */
+    .desc-input {
+      height: 36px;
+      padding: 4px 12px;
+      border: 1px solid var(--color-border-input);
+      border-radius: var(--radius-input);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-body);
+      background: var(--color-surface);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+    .desc-input::placeholder { color: var(--color-text-muted); }
+    .desc-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+
+    /* ── Category grid ── */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .cat-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 17px 4px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .cat-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .cat-btn.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+    }
+    .cat-btn__emoji { font-size: 24px; line-height: 32px; }
+
+    /* ── Chip groups (Paid by / Exclude) ── */
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      height: 42px;
+      padding: 0 18px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 99px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Paid-by: single select — selected = solid purple */
+    .chip.paid-selected {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    /* Exclude: multi-select — selected = red tint */
+    .chip.excl-selected {
+      background: var(--color-error-bg);
+      border-color: var(--color-error-border);
+      color: var(--color-error-text);
+    }
+
+    /* ── Split summary ── */
+    .split-box {
+      background: rgba(221, 214, 254, 0.3);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 17px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+    }
+
+    .split-box__names { margin-bottom: 4px; }
+
+    .split-box__amount {
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Submit button ── */
+    .submit-btn {
+      height: 36px;
+      width: 100%;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--color-primary-hover); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .submit-btn.loading .spinner   { display: block; }
+    .submit-btn.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Banner ── */
+    .banner {
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 18px;
+      display: none;
+    }
+    .banner.error   { background: var(--color-error-bg);   color: var(--color-error-text);   border: 1px solid var(--color-error-border); }
+    .banner.success { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); }
+    .banner.visible { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .page-header { padding: 0 16px; }
+      .page-content { padding: 24px 16px 60px; }
+      .category-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <header class="page-header">
+    <div class="page-header__inner">
+      <h1 class="page-header__title">Add Expense</h1>
+      <button class="close-btn" onclick="window.location.href='dashboard.html'" title="Close">
+        <svg viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main form ────────────────────────────────────────── -->
+  <main class="page-content">
+
+    <!-- Banner -->
+    <div id="banner" class="banner" role="alert"></div>
+
+    <!-- Amount -->
+    <div class="amount-card">
+      <div class="amount-card__label">Amount</div>
+      <div class="amount-card__row">
+        <span class="amount-card__currency">SAR</span>
+        <input
+          id="amountInput"
+          class="amount-card__input"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.01"
+          placeholder="0"
+        />
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <div class="section-label">Description</div>
+      <input
+        id="descInput"
+        class="desc-input"
+        type="text"
+        placeholder="What was this expense for?"
+        maxlength="100"
+      />
+    </div>
+
+    <!-- Category -->
+    <div>
+      <div class="section-label">Category</div>
+      <div class="category-grid" id="categoryGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Paid by -->
+    <div>
+      <div class="section-label">Paid by</div>
+      <div class="chip-group" id="paidByGroup">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Exclude -->
+    <div>
+      <div class="section-label">Exclude from this expense</div>
+      <div class="chip-group" id="excludeGroup">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Split summary -->
+    <div class="split-box">
+      <div id="splitNames" class="split-box__names">Split between —</div>
+      <div id="splitAmount" class="split-box__amount">SAR 0.00 <span style="font-weight:400">per person</span></div>
+    </div>
+
+    <!-- Submit -->
+    <button id="submitBtn" class="submit-btn" type="button" disabled>
+      <span class="spinner"></span>
+      <span class="btn-label">Add Expense</span>
+    </button>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    // ── Categories ─────────────────────────────────────────
+    const CATEGORIES = [
+      { id: 'food',      emoji: '🍎', label: 'Food' },
+      { id: 'utilities', emoji: '⚡', label: 'Utilities' },
+      { id: 'cleaning',  emoji: '🧹', label: 'Cleaning' },
+      { id: 'home',      emoji: '🏠', label: 'Home' },
+      { id: 'fun',       emoji: '🎉', label: 'Fun' },
+      { id: 'transport', emoji: '🚗', label: 'Transport' },
+      { id: 'health',    emoji: '💊', label: 'Health' },
+      { id: 'other',     emoji: '📦', label: 'Other' },
+    ];
+
+    // ── State ──────────────────────────────────────────────
+    let currentUser   = null;
+    let householdId   = null;
+    let members       = [];      // [{id, full_name}]
+    let selectedCat   = null;    // category id string
+    let paidById      = null;    // user id
+    let excludedIds   = new Set(); // user ids to exclude
+
+    // ── DOM ────────────────────────────────────────────────
+    const amountInput  = document.getElementById('amountInput');
+    const descInput    = document.getElementById('descInput');
+    const categoryGrid = document.getElementById('categoryGrid');
+    const paidByGroup  = document.getElementById('paidByGroup');
+    const excludeGroup = document.getElementById('excludeGroup');
+    const splitNames   = document.getElementById('splitNames');
+    const splitAmount  = document.getElementById('splitAmount');
+    const submitBtn    = document.getElementById('submitBtn');
+    const banner       = document.getElementById('banner');
+
+    // ── Helpers ────────────────────────────────────────────
+    function showError(msg) { banner.textContent = msg; banner.className = 'banner error visible'; }
+    function hideBanner()   { banner.className = 'banner'; }
+
+    function sar(n) {
+      return 'SAR ' + Number(n).toLocaleString('en-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ── Render categories ──────────────────────────────────
+    function renderCategories() {
+      categoryGrid.innerHTML = CATEGORIES.map(c => `
+        <button
+          class="cat-btn${selectedCat === c.id ? ' selected' : ''}"
+          data-cat="${c.id}"
+          type="button"
+        >
+          <span class="cat-btn__emoji">${c.emoji}</span>
+          ${c.label}
+        </button>
+      `).join('');
+
+      categoryGrid.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedCat = btn.dataset.cat;
+          renderCategories();
+          updateSubmitState();
+        });
+      });
+    }
+
+    // ── Render paid-by chips ───────────────────────────────
+    function renderPaidBy() {
+      paidByGroup.innerHTML = members.map(m => `
+        <button
+          class="chip${paidById === m.id ? ' paid-selected' : ''}"
+          data-uid="${m.id}"
+          type="button"
+        >${m.full_name.split(' ')[0]}</button>
+      `).join('');
+
+      paidByGroup.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          paidById = chip.dataset.uid;
+          renderPaidBy();
+          updateSplitSummary();
+          updateSubmitState();
+        });
+      });
+    }
+
+    // ── Render exclude chips ───────────────────────────────
+    function renderExclude() {
+      excludeGroup.innerHTML = members.map(m => `
+        <button
+          class="chip${excludedIds.has(m.id) ? ' excl-selected' : ''}"
+          data-uid="${m.id}"
+          type="button"
+        >${m.full_name.split(' ')[0]}</button>
+      `).join('');
+
+      excludeGroup.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const uid = chip.dataset.uid;
+          if (excludedIds.has(uid)) {
+            excludedIds.delete(uid);
+          } else {
+            excludedIds.add(uid);
+          }
+          renderExclude();
+          updateSplitSummary();
+          updateSubmitState();
+        });
+      });
+    }
+
+    // ── Update split summary ───────────────────────────────
+    function updateSplitSummary() {
+      const amount = parseFloat(amountInput.value) || 0;
+      const participants = members.filter(m => !excludedIds.has(m.id));
+
+      if (participants.length === 0) {
+        splitNames.textContent  = 'No participants — add someone back';
+        splitAmount.innerHTML   = 'SAR 0.00 <span style="font-weight:400">per person</span>';
+        return;
+      }
+
+      const perPerson = amount / participants.length;
+      const names = participants.map(m => m.full_name.split(' ')[0]).join(', ');
+      splitNames.textContent = `Split between ${names}`;
+      splitAmount.innerHTML = `<span>${sar(perPerson)}</span> <span style="font-weight:400">per person</span>`;
+    }
+
+    // ── Submit button enabled state ────────────────────────
+    function updateSubmitState() {
+      const amount = parseFloat(amountInput.value);
+      const desc   = descInput.value.trim();
+      const participants = members.filter(m => !excludedIds.has(m.id));
+      const valid  = amount > 0 && desc.length > 0 && selectedCat && paidById && participants.length > 0;
+      submitBtn.disabled = !valid;
+    }
+
+    // ── Live update on amount / description change ─────────
+    amountInput.addEventListener('input', () => { updateSplitSummary(); updateSubmitState(); });
+    descInput.addEventListener('input', updateSubmitState);
+
+    // ── Submit ─────────────────────────────────────────────
+    submitBtn.addEventListener('click', async () => {
+      hideBanner();
+      const amount = parseFloat(amountInput.value);
+      const desc   = descInput.value.trim();
+
+      if (amount <= 0)         return showError('Please enter an amount.');
+      if (!desc)               return showError('Please enter a description.');
+      if (!selectedCat)        return showError('Please select a category.');
+      if (!paidById)           return showError('Please select who paid.');
+
+      const participants = members.filter(m => !excludedIds.has(m.id));
+      if (participants.length === 0) return showError('At least one person must be included.');
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        // 1. Insert expense
+        const { data: expense, error: expErr } = await sb
+          .from('expenses')
+          .insert({
+            household_id: householdId,
+            paid_by:      paidById,
+            description:  desc,
+            amount:       amount,
+            category:     selectedCat,
+          })
+          .select()
+          .single();
+
+        if (expErr) throw expErr;
+
+        // 2. Insert exclusions (members who are excluded)
+        if (excludedIds.size > 0) {
+          const exclusions = [...excludedIds].map(uid => ({
+            expense_id: expense.id,
+            user_id:    uid,
+          }));
+
+          const { error: exclErr } = await sb
+            .from('expense_exclusions')
+            .insert(exclusions);
+
+          if (exclErr) throw exclErr;
+        }
+
+        // 3. Success — go back to dashboard
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        showError(err.message ?? 'Something went wrong. Please try again.');
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ── Boot ───────────────────────────────────────────────
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+      currentUser = session.user;
+
+      // Load profile + household
+      const { data: profile } = await sb
+        .from('users')
+        .select('household_id, full_name')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (!profile?.household_id) { window.location.href = 'household.html'; return; }
+      householdId = profile.household_id;
+
+      // Load all household members
+      const { data: memberData } = await sb
+        .from('users')
+        .select('id, full_name')
+        .eq('household_id', householdId);
+
+      members = memberData || [];
+
+      // Default paid-by = current user
+      paidById = currentUser.id;
+
+      // Render UI
+      renderCategories();
+      renderPaidBy();
+      renderExclude();
+      updateSplitSummary();
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Create Household</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;500&family=Cousine&display=swap" rel="stylesheet" />
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── Card ── */
+    .household-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      width: 448px;
+      max-width: 100%;
+      padding: 33px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Progress ── */
+    .step-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .step-label {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+    }
+
+    .progress-track {
+      height: 8px;
+      background: rgba(124, 58, 237, 0.2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Icon + heading block ── */
+    .card-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .card-hero__emoji {
+      font-size: 48px;
+      line-height: 48px;
+    }
+
+    .card-hero__title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--color-text-heading);
+    }
+
+    .card-hero__subtitle {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+      max-width: 373px;
+    }
+
+    /* ── Invite code box ── */
+    .invite-box {
+      background: var(--color-bg);
+      border: 2px solid var(--color-primary);
+      border-radius: 12px;
+      padding: 26px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .invite-box__code {
+      font-family: 'Cousine', monospace;
+      font-size: 36px;
+      line-height: 40px;
+      letter-spacing: 3.6px;
+      color: var(--color-primary);
+    }
+
+    .invite-box__expiry {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Copy button icon ── */
+    .btn-copy-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Skip button ── */
+    .btn-skip {
+      background: transparent;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      cursor: pointer;
+      width: 100%;
+      height: 36px;
+      border-radius: var(--radius-btn);
+      transition: background 0.15s;
+    }
+    .btn-skip:hover { background: rgba(0,0,0,0.04); }
+
+    /* ── Step panels ── */
+    #step2 { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="household-card">
+
+    <!-- ════════════════════════════════
+         STEP 1 — Create household
+         ════════════════════════════════ -->
+    <div id="step1">
+
+      <!-- Progress -->
+      <div class="step-header">
+        <span class="step-label">Step 1 of 2</span>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 50%"></div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="card-hero">
+        <span class="card-hero__emoji">🏠</span>
+        <div>
+          <h2 class="card-hero__title">Create your household</h2>
+          <p class="card-hero__subtitle">Give your shared space a name. You can always change this later.</p>
+        </div>
+      </div>
+
+      <!-- Banner -->
+      <div id="banner1" class="banner" role="alert"></div>
+
+      <!-- Form -->
+      <div class="form">
+        <div class="field">
+          <label for="householdName">Household name</label>
+          <input
+            id="householdName"
+            type="text"
+            placeholder="e.g. Downtown Apartment · شقة وسط البلد"
+            autocomplete="off"
+            maxlength="60"
+          />
+        </div>
+
+        <button id="continueBtn" class="btn btn-primary" type="button" disabled>
+          <span class="spinner"></span>
+          <span class="btn-label">Continue</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════════════
+         STEP 2 — Invite roommates
+         ════════════════════════════════ -->
+    <div id="step2">
+
+      <!-- Progress -->
+      <div class="step-header">
+        <span class="step-label">Step 2 of 2</span>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="card-hero">
+        <span class="card-hero__emoji">✉️</span>
+        <div>
+          <h2 class="card-hero__title">Invite your roommates</h2>
+          <p class="card-hero__subtitle">Share this code with your household members so they can join.</p>
+        </div>
+      </div>
+
+      <!-- Banner -->
+      <div id="banner2" class="banner" role="alert"></div>
+
+      <!-- Invite code display -->
+      <div class="invite-box">
+        <div id="inviteCode" class="invite-box__code">——————</div>
+        <div class="invite-box__expiry">Expires in 7 days</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form">
+        <button id="copyBtn" class="btn btn-primary" type="button">
+          <!-- Copy icon (SVG) -->
+          <svg class="btn-copy-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5.5" y="5.5" width="8" height="8" rx="1"/>
+            <path d="M10.5 5.5V3.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/>
+          </svg>
+          <span class="btn-label">Copy invite link</span>
+        </button>
+
+        <button id="skipBtn" class="btn-skip" type="button">Skip for now</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    // ── DOM refs ───────────────────────────────────────────────
+    const step1         = document.getElementById('step1');
+    const step2         = document.getElementById('step2');
+    const nameInput     = document.getElementById('householdName');
+    const continueBtn   = document.getElementById('continueBtn');
+    const banner1       = document.getElementById('banner1');
+    const inviteCodeEl  = document.getElementById('inviteCode');
+    const copyBtn       = document.getElementById('copyBtn');
+    const skipBtn       = document.getElementById('skipBtn');
+    const banner2       = document.getElementById('banner2');
+
+    let currentSession  = null;
+    let generatedCode   = '';
+
+    // ── Banner helpers ─────────────────────────────────────────
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.className = 'banner error visible';
+    }
+    function showSuccess(el, msg) {
+      el.textContent = msg;
+      el.className = 'banner success visible';
+    }
+    function hideBanner(el) { el.className = 'banner'; }
+
+    // ── Require auth ───────────────────────────────────────────
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+      currentSession = session;
+
+      // If user already has a household, skip straight to dashboard
+      const { data: profile } = await sb
+        .from('users')
+        .select('household_id')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile?.household_id) {
+        window.location.href = 'dashboard.html';
+      }
+    })();
+
+    // ── Enable Continue only when input has text ───────────────
+    nameInput.addEventListener('input', () => {
+      continueBtn.disabled = nameInput.value.trim().length === 0;
+    });
+
+    nameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !continueBtn.disabled) continueBtn.click();
+    });
+
+    // ── Generate a random 6-character invite code ──────────────
+    function generateCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars (0/O, 1/I)
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return code;
+    }
+
+    // ── STEP 1: Create household ───────────────────────────────
+    continueBtn.addEventListener('click', async () => {
+      hideBanner(banner1);
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      continueBtn.classList.add('loading');
+      continueBtn.disabled = true;
+
+      try {
+        generatedCode = generateCode();
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+        // 1. Insert new household
+        const { data: household, error: householdError } = await sb
+          .from('households')
+          .insert({
+            name:               name,
+            invite_code:        generatedCode,
+            invite_expires_at:  expiresAt
+          })
+          .select()
+          .single();
+
+        if (householdError) throw householdError;
+
+        // 2. Link current user to the household
+        const { error: updateError } = await sb
+          .from('users')
+          .update({ household_id: household.id })
+          .eq('id', currentSession.user.id);
+
+        if (updateError) throw updateError;
+
+        // 3. Show step 2
+        inviteCodeEl.textContent = generatedCode;
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+
+      } catch (err) {
+        showError(banner1, err.message ?? 'Something went wrong. Please try again.');
+        continueBtn.classList.remove('loading');
+        continueBtn.disabled = false;
+      }
+    });
+
+    // ── STEP 2: Copy invite code ───────────────────────────────
+    copyBtn.addEventListener('click', async () => {
+      try {
+        // Build a shareable link with the code as a query param
+        const url = `${window.location.origin}/household-join.html?code=${generatedCode}`;
+        await navigator.clipboard.writeText(url);
+        const label = copyBtn.querySelector('.btn-label');
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy invite link'; }, 2000);
+      } catch {
+        // Fallback: just copy the code itself
+        try {
+          await navigator.clipboard.writeText(generatedCode);
+          showSuccess(banner2, `Code copied: ${generatedCode}`);
+        } catch {
+          showError(banner2, 'Could not copy — your code is: ' + generatedCode);
+        }
+      }
+    });
+
+    // ── STEP 2: Skip → go to dashboard ────────────────────────
+    skipBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+
+</body>
+</html>

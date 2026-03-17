@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Sign In</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-card__header">
+      <h1 class="auth-card__title">Welcome back</h1>
+      <p class="auth-card__subtitle">Sign in to your household</p>
+    </div>
+
+    <!-- Banner -->
+    <div id="banner" class="banner" role="alert"></div>
+
+    <!-- Form -->
+    <div class="form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="your@email.com" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+      </div>
+
+      <button id="submitBtn" class="btn btn-primary" type="button">
+        <span class="spinner"></span>
+        <span class="btn-label">Sign in</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="auth-card__footer">
+      Don't have an account? <a href="signup.html">Create one</a>
+    </div>
+
+  </div>
+
+<!-- Load Supabase SDK from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0"></script>
+
+<!-- Then load your Supabase client initialization -->
+<script src="js/supabase.js"></script>
+
+<!-- Then load your app scripts that use sb -->
+<script src="js/auth.js"></script>
+
+  <script>
+    const emailInput  = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitBtn   = document.getElementById('submitBtn');
+    const banner      = document.getElementById('banner');
+
+    function showError(msg) {
+      banner.textContent = msg;
+      banner.className = 'banner error visible';
+    }
+    function hideBanner() {
+      banner.className = 'banner';
+    }
+
+    submitBtn.addEventListener('click', async () => {
+      hideBanner();
+
+      const email    = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return showError('Please enter a valid email address.');
+      if (!password)
+        return showError('Please enter your password.');
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+        if (error) throw error;
+
+        // Check if user has a household yet
+        const userId = data.user.id;
+        const { data: profile } = await sb
+          .from('users')
+          .select('household_id')
+          .eq('id', userId)
+          .single();
+
+        if (profile?.household_id) {
+          window.location.href = 'dashboard.html';
+        } else {
+          window.location.href = 'household.html';
+        }
+
+      } catch (err) {
+        // Supabase returns "Invalid login credentials" for wrong email/password
+        showError(err.message ?? 'Sign in failed. Please try again.');
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Allow Enter key on any field to submit
+    [emailInput, passwordInput].forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+    });
+
+    // Redirect already-logged-in users
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) window.location.href = 'dashboard.html';
+    })();
+  </script>
+
+</body>
+</html>

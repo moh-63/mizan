@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ── Layout ── */
+    body { background: var(--color-bg); }
+
+    .app-page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Top header ── */
+    .dash-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 24px 59.5px 0;
+      flex-shrink: 0;
+    }
+
+    .dash-header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .dash-header__greeting {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--color-text-heading);
+    }
+
+    .dash-header__household {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    .dash-header__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      padding: 0 16px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .dash-header__btn:hover { background: var(--color-primary-hover); text-decoration: none; }
+    .dash-header__btn svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* ── Scrollable content ── */
+    .dash-content {
+      flex: 1;
+      padding: 32px 83.5px 100px; /* 100px bottom clears nav */
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 1143px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ── Stat cards ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card__label {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+    }
+
+    .stat-card__value {
+      font-family: var(--font-display);
+      font-size: 30px;
+      line-height: 36px;
+      color: var(--color-text-heading);
+    }
+
+    .stat-card__value.positive { color: var(--color-green); }
+    .stat-card__value.negative { color: var(--color-red); }
+
+    /* ── Section ── */
+    .section { display: flex; flex-direction: column; gap: 16px; }
+
+    .section__title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 28px;
+      color: var(--color-text-heading);
+    }
+
+    /* ── Panel (shared by balance list + expense list) ── */
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* ── Balance rows ── */
+    .balance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      height: 77px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .balance-row:last-child { border-bottom: none; }
+
+    .balance-row__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .balance-row__name {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      line-height: 24px;
+    }
+
+    .balance-row__direction {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 20px;
+    }
+
+    .balance-row__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .balance-row__amount {
+      font-size: 18px;
+      line-height: 28px;
+      color: var(--color-text-heading);
+    }
+    .balance-row__amount.positive { color: var(--color-green); }
+    .balance-row__amount.negative { color: var(--color-red); }
+
+    .balance-row__status {
+      font-size: 14px;
+      font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    .settle-btn {
+      height: 32px;
+      padding: 0 12px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .settle-btn:hover { background: var(--color-primary-hover); }
+
+    /* ── Expense rows ── */
+    .expense-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .expense-row:last-child { border-bottom: none; }
+
+    .expense-row__left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .expense-row__emoji {
+      font-size: 24px;
+      line-height: 32px;
+      flex-shrink: 0;
+    }
+
+    .expense-row__desc {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .expense-row__meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .paid-by-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 3px 9px;
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--color-primary);
+      white-space: nowrap;
+    }
+
+    .expense-row__date {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .expense-row__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .expense-row__total {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      line-height: 24px;
+    }
+
+    .expense-row__split {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 20px;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-red);
+      cursor: pointer;
+      padding: 2px 0;
+      line-height: 16px;
+    }
+    .delete-btn:hover { text-decoration: underline; }
+
+    /* ── Empty state ── */
+    .empty {
+      padding: 40px 16px;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 81px;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .bottom-nav__inner {
+      width: 100%;
+      max-width: 1143px;
+      margin: 0 auto;
+      padding: 0 59.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .nav-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      border-radius: 12px;
+      transition: color 0.15s;
+    }
+    .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-link:hover { text-decoration: none; color: var(--color-primary); }
+    .nav-link.active { color: var(--color-primary); background: rgba(124,58,237,0.1); }
+
+    .nav-add {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .nav-add__icon {
+      width: 44px; height: 44px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+      margin-top: -8px;
+    }
+    .nav-add__icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .nav-add span { color: var(--color-primary); }
+
+    /* ── Skeleton loader ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0eeff 25%, #e8e4ff 50%, #f0eeff 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .dash-header { padding: 16px 16px 0; }
+      .dash-content { padding: 24px 16px 100px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .bottom-nav__inner { padding: 0 8px; }
+    }
+  </style>
+</head>
+<body class="app-page">
+
+  <!-- ── Top Header ─────────────────────────────────────── -->
+  <header class="dash-header">
+    <div class="dash-header__inner">
+      <div>
+        <div id="greeting" class="dash-header__greeting">Good day.</div>
+        <div id="householdName" class="dash-header__household">Loading…</div>
+      </div>
+      <a href="add-expense.html" class="dash-header__btn">
+        <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+        Add Expense
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Main Content ────────────────────────────────────── -->
+  <main class="dash-content">
+
+    <!-- Stat cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card__label">You are owed</div>
+        <div id="statOwed" class="stat-card__value positive">SAR —</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">You owe</div>
+        <div id="statOwe" class="stat-card__value negative">SAR —</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">This month</div>
+        <div id="statMonth" class="stat-card__value">SAR —</div>
+      </div>
+    </div>
+
+    <!-- Balances section -->
+    <div class="section">
+      <div class="section__title">Balances</div>
+      <div class="panel" id="balanceList">
+        <div class="empty">Loading balances…</div>
+      </div>
+    </div>
+
+    <!-- Recent Expenses section -->
+    <div class="section">
+      <div class="section__title">Recent Expenses</div>
+      <div class="panel" id="expenseList">
+        <div class="empty">Loading expenses…</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Bottom Nav ──────────────────────────────────────── -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav__inner">
+      <!-- Home -->
+      <a href="dashboard.html" class="nav-link active">
+        <svg viewBox="0 0 20 20"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+        Home
+      </a>
+      <!-- Expenses -->
+      <a href="expense_history.html" class="nav-link">
+        <svg viewBox="0 0 20 20"><rect x="4" y="2" width="12" height="16" rx="1"/><line x1="7" y1="7" x2="13" y2="7"/><line x1="7" y1="10" x2="13" y2="10"/><line x1="7" y1="13" x2="10" y2="13"/></svg>
+        Expenses
+      </a>
+      <!-- Add -->
+      <a href="add-expense.html" class="nav-add">
+        <div class="nav-add__icon">
+          <svg viewBox="0 0 22 22"><line x1="11" y1="3" x2="11" y2="19"/><line x1="3" y1="11" x2="19" y2="11"/></svg>
+        </div>
+        <span>Add</span>
+      </a>
+      <!-- Profile -->
+      <a href="profile.html" class="nav-link">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="6" r="3"/><path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7"/></svg>
+        Profile
+      </a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    // ─────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────
+    function sar(amount) {
+      return 'SAR ' + Math.abs(amount).toLocaleString('en-SA', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function greeting() {
+      const h = new Date().getHours();
+      if (h < 12) return 'Good morning';
+      if (h < 17) return 'Good afternoon';
+      return 'Good evening';
+    }
+
+    function categoryEmoji(cat) {
+      const map = { food:'🍎', utilities:'⚡', cleaning:'🧹', home:'🏠', fun:'🎉', transport:'🚗', health:'💊', other:'📦' };
+      return map[(cat||'').toLowerCase()] || '📦';
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-SA', { month: 'short', day: 'numeric' });
+    }
+
+    function getInitial(name) {
+      return (name || '?')[0].toUpperCase();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Main load
+    // ─────────────────────────────────────────────────────────
+    (async () => {
+      // 1. Auth check
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+      const me = session.user;
+
+      // 2. Load current user profile
+      const { data: myProfile, error: profileErr } = await sb
+        .from('users')
+        .select('id, full_name, household_id')
+        .eq('id', me.id)
+        .single();
+
+      if (profileErr || !myProfile?.household_id) {
+        window.location.href = 'household.html';
+        return;
+      }
+
+      const householdId = myProfile.household_id;
+
+      // 3. Greeting
+      document.getElementById('greeting').textContent =
+        `${greeting()}, ${myProfile.full_name.split(' ')[0]}.`;
+
+      // 4. Load household name
+      const { data: household } = await sb
+        .from('households')
+        .select('name')
+        .eq('id', householdId)
+        .single();
+
+      document.getElementById('householdName').textContent = household?.name || '';
+
+      // 5. Load all household members
+      const { data: members } = await sb
+        .from('users')
+        .select('id, full_name')
+        .eq('household_id', householdId);
+
+      const memberMap = {};
+      (members || []).forEach(m => { memberMap[m.id] = m.full_name; });
+
+      // 6. Load all expenses for household
+      const { data: expenses } = await sb
+        .from('expenses')
+        .select('id, paid_by, description, amount, category, created_at')
+        .eq('household_id', householdId)
+        .order('created_at', { ascending: false });
+
+      // 7. Load all exclusions
+      const { data: exclusions } = await sb
+        .from('expense_exclusions')
+        .select('expense_id, user_id');
+
+      const exclusionMap = {};
+      (exclusions || []).forEach(ex => {
+        if (!exclusionMap[ex.expense_id]) exclusionMap[ex.expense_id] = new Set();
+        exclusionMap[ex.expense_id].add(ex.user_id);
+      });
+
+      // 8. Load all settlements
+      const { data: settlements } = await sb
+        .from('settlements')
+        .select('expense_id, payer_id, payee_id, amount');
+
+      // ── Runtime balance calculation ────────────────────────
+      // balances[userId] = net amount relative to me
+      //   positive = they owe me
+      //   negative = I owe them
+      const balances = {};
+      const memberIds = Object.keys(memberMap).filter(id => id !== me.id);
+      memberIds.forEach(id => { balances[id] = 0; });
+
+      (expenses || []).forEach(exp => {
+        const excluded = exclusionMap[exp.id] || new Set();
+        // Who participates: all members minus excluded
+        const participants = Object.keys(memberMap).filter(id => !excluded.has(id));
+        if (participants.length === 0) return;
+
+        const share = exp.amount / participants.length;
+        const paidBy = exp.paid_by;
+
+        if (paidBy === me.id) {
+          // I paid — everyone else who participates owes me their share
+          participants.forEach(id => {
+            if (id !== me.id && balances[id] !== undefined) {
+              balances[id] += share;
+            }
+          });
+        } else {
+          // Someone else paid — if I participate, I owe them my share
+          if (participants.includes(me.id) && balances[paidBy] !== undefined) {
+            balances[paidBy] -= share;
+          }
+        }
+      });
+
+      // Apply settlements
+      (settlements || []).forEach(s => {
+        if (s.payer_id === me.id && balances[s.payee_id] !== undefined) {
+          // I paid someone → reduces what I owe them
+          balances[s.payee_id] += s.amount;
+        } else if (s.payee_id === me.id && balances[s.payer_id] !== undefined) {
+          // Someone paid me → reduces what they owe me
+          balances[s.payer_id] -= s.amount;
+        }
+      });
+
+      // ── Stat cards ─────────────────────────────────────────
+      let totalOwed = 0, totalOwe = 0;
+      Object.values(balances).forEach(b => {
+        if (b > 0.005) totalOwed += b;
+        else if (b < -0.005) totalOwe += Math.abs(b);
+      });
+
+      // This month's expenses
+      const now = new Date();
+      const monthTotal = (expenses || [])
+        .filter(e => {
+          const d = new Date(e.created_at);
+          return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        })
+        .reduce((sum, e) => sum + e.amount, 0);
+
+      document.getElementById('statOwed').textContent = sar(totalOwed);
+      document.getElementById('statOwe').textContent  = sar(totalOwe);
+      document.getElementById('statMonth').textContent = sar(monthTotal);
+
+      // ── Render balances ────────────────────────────────────
+      const balanceList = document.getElementById('balanceList');
+      const balanceEntries = Object.entries(balances).filter(([, b]) => Math.abs(b) > 0.005);
+
+      if (balanceEntries.length === 0) {
+        balanceList.innerHTML = '<div class="empty">All settled up! 🎉</div>';
+      } else {
+        balanceList.innerHTML = balanceEntries.map(([uid, amount]) => {
+          const name = memberMap[uid] || 'Unknown';
+          const owesMe = amount > 0;
+          const amountStr = sar(Math.abs(amount));
+          const initial = getInitial(name);
+
+          const rightHtml = owesMe
+            ? `<span class="balance-row__amount positive">${amountStr}</span>
+               <span class="balance-row__status">Awaiting payment</span>`
+            : `<span class="balance-row__amount negative">${amountStr}</span>
+               <button class="settle-btn" onclick="goSettle('${uid}', '${name}', ${Math.abs(amount).toFixed(2)})">Settle</button>`;
+
+          return `
+            <div class="balance-row">
+              <div class="balance-row__left">
+                <div class="avatar">${initial}</div>
+                <div>
+                  <div class="balance-row__name">${name}</div>
+                  <div class="balance-row__direction">${owesMe ? 'owes you' : 'you owe'}</div>
+                </div>
+              </div>
+              <div class="balance-row__right">${rightHtml}</div>
+            </div>`;
+        }).join('');
+      }
+
+      // ── Render recent expenses (latest 5) ──────────────────
+      const expenseList = document.getElementById('expenseList');
+      const recent = (expenses || []).slice(0, 5);
+
+      if (recent.length === 0) {
+        expenseList.innerHTML = '<div class="empty">No expenses yet. Add one!</div>';
+      } else {
+        expenseList.innerHTML = recent.map(exp => {
+          const excluded = exclusionMap[exp.id] || new Set();
+          const participants = Object.keys(memberMap).filter(id => !excluded.has(id));
+          const share = participants.length > 0 ? exp.amount / participants.length : 0;
+          const paidByName = memberMap[exp.paid_by] || 'Someone';
+          const isMine = exp.paid_by === me.id;
+          const emoji = categoryEmoji(exp.category);
+
+          const deleteBtn = isMine
+            ? `<button class="delete-btn" onclick="deleteExpense('${exp.id}')">Delete</button>`
+            : '';
+
+          return `
+            <div class="expense-row" id="exp-${exp.id}">
+              <div class="expense-row__left">
+                <span class="expense-row__emoji">${emoji}</span>
+                <div>
+                  <div class="expense-row__desc">${exp.description}</div>
+                  <div class="expense-row__meta">
+                    <span class="paid-by-badge">Paid by ${paidByName}</span>
+                    <span class="expense-row__date">${formatDate(exp.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="expense-row__right">
+                <div class="expense-row__total">${sar(exp.amount)}</div>
+                <div class="expense-row__split">${sar(share)} each</div>
+                ${deleteBtn}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+    })();
+
+    // ─────────────────────────────────────────────────────────
+    // Delete expense
+    // ─────────────────────────────────────────────────────────
+    async function deleteExpense(expenseId) {
+      if (!confirm('Delete this expense? This cannot be undone.')) return;
+
+      const { error } = await sb
+        .from('expenses')
+        .delete()
+        .eq('id', expenseId);
+
+      if (error) {
+        alert('Could not delete: ' + error.message);
+      } else {
+        const row = document.getElementById('exp-' + expenseId);
+        if (row) row.remove();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Go to settle page
+    // ─────────────────────────────────────────────────────────
+    function goSettle(payeeId, payeeName, amount) {
+      const params = new URLSearchParams({ payeeId, payeeName, amount });
+      window.location.href = 'settle.html?' + params.toString();
+    }
+  </script>
+
+</body>
+</html>
