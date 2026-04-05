@@ -32,15 +32,14 @@ to be filled with git history
 
 | Figure | Description |
 |--------|-------------|
-| Figure 1 | System Layer Diagram |
-| Figure 2 | Entity Relationship Diagram (ERD) |
-| Figure 3 | Sign-Up Sequence Diagram |
-| Figure 4 | Add Expense Sequence Diagram |
-| Figure 5 | Balance Calculation Algorithm |
-| Figure 6 | Settle Flow Sequence Diagram |
-| Figure 7 | Repository Structure |
-| Figure 8 | Deployment Pipeline |
-| Figure 9 | Physical Infrastructure Diagram |
+| Figure 1 | Entity Relationship Diagram (ERD) |
+| Figure 2 | Sign-Up Sequence Diagram |
+| Figure 3 | Add Expense Sequence Diagram |
+| Figure 4 | Balance Calculation Algorithm |
+| Figure 5 | Settle Flow Sequence Diagram |
+| Figure 6 | Repository Structure |
+| Figure 7 | Deployment Pipeline |
+| Figure 8 | Physical Infrastructure Diagram |
 
 ---
 
@@ -97,9 +96,7 @@ Mizan enables groups of roommates to:
 
 Mizan is a **serverless, client-rendered web application**. There is no custom application server. All pages are static HTML/CSS/JS files served from a CDN (Vercel), and all backend functionality — authentication, database queries, and security enforcement — is provided by Supabase as a managed service.
 
-FILL SYSTEM ARCH FIGURE HERE
 
-*Figure 1 — System Layer Diagram*
 
 ### 3.2 Architectural Style
 
@@ -185,12 +182,8 @@ The system is organised into four logical layers:
 
 
 
-ER DIAGRAM HEERE -----------------------------------------------------------------------------------
-<img width="596" height="668" alt="Screenshot 2026-04-05 at 11 20 05 am" src="https://github.com/user-attachments/assets/5f6d2fa6-696e-4028-9e6b-4d43096473e7" />
 
-
-
-
+<img width="1924" height="518" alt="ER_Diagram" src="https://github.com/user-attachments/assets/4c015ca3-36dd-436f-a7b8-6e370fa145b9" />
 
 
 *Figure 2 — Entity Relationship Diagram*
@@ -393,25 +386,9 @@ All five tables have RLS enabled. Policies follow the principle of least privile
 The Physical View describes how software components map to infrastructure.
 
 ### 8.1 Infrastructure Overview
-┌──────────────┐     push      ┌──────────────┐    webhook    ┌──────────────┐
-│              │──────────────►│              │──────────────►│              │
-│    GitHub    │               │    Vercel    │               │   Vercel CDN │
-│  Repository  │               │  Build System│               │  Edge Nodes  │
-│              │               │              │               │ (Global CDN) │
-└──────────────┘               └──────────────┘               └──────┬───────┘
-│ HTTPS
-┌──────▼───────┐
-│ User Browser │
-└──────┬───────┘
-│ HTTPS
-┌──────▼───────┐
-│   Supabase   │
-│  Auth + API  │
-│  PostgreSQL  │
-└──────────────┘
 
-PHYSICAL STRUCTURE DIAGRAM HERE E---------------------------RFIDRSGORIUEGBERAUGIAERUGFAEIRGBFIUAERGIUERABGIAERBGG
 
+<img width="1250" height="558" alt="System_Architecture drawio" src="https://github.com/user-attachments/assets/2ad82d77-26b9-4695-be87-26f48fe4b2ee" />
 
 
 
