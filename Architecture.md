@@ -86,7 +86,7 @@ Mizan enables groups of roommates to:
 | Supabase RLS Guide | https://supabase.com/docs/guides/database/postgres/row-level-security |
 | PostgREST Documentation | https://postgrest.org |
 | Vercel Documentation | https://vercel.com/docs |
-| Figma Design File | to be filled with figma design link |
+| Figma Design File | (https://www.figma.com/design/5SBe7HBIG1r4e95GMiPpPD/Mizan-UI-Frames?m=auto&t=3zatxUNPwl2I7H6T-1) |
 
 ---
 
