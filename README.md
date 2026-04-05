@@ -11,4 +11,4 @@ ZEYAD GARWAN, 230513395, Username: ZeyadGarwan
 A concise summary of the project and the problem it solves.
 
 ## Architecture Link
-A direct link to your `ARCHITECTURE.md` file.
+[Architecture Documentation](architecture.md)
