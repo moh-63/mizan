@@ -293,22 +293,21 @@ The Development View describes the static organisation of the codebase, the tech
 
 ### 7.1 Repository Structure
 mizan/
-├── index.html              # Landing page — CTA + redirect for logged-in users
-├── signup.html             # Registration form
-├── signin.html             # Login form
-├── household.html          # Create household (2 steps) or join with code
-├── household-join.html     # Shareable invite link landing page
-├── dashboard.html          # Main dashboard: balances, expenses, settle modal
-├── add-expense.html        # Add expense form
-├── expense_history.html    # Full history with search, filter, sort
-├── profile.html            # User info, IBAN editor, household info, sign out
-│
-├── css/
-│   └── style.css           # Shared design system (tokens, layouts, components)
-│
-└── js/
-├── supabase.js         # Supabase client initialisation
-└── auth.js             # requireAuth() and signOut() helpers
+1. ├── index.html              # Landing page — CTA + redirect for logged-in users
+2. ├── signup.html             # Registration form
+3. ├── signin.html             # Login form
+4. ├── household.html          # Create household (2 steps) or join with code
+5. ├── household-join.html     # Shareable invite link landing page
+6. ├── dashboard.html          # Main dashboard: balances, expenses, settle modal
+7. ├── add-expense.html        # Add expense form
+8. ├── expense_history.html    # Full history with search, filter, sort
+9. ├── profile.html            # User info, IBAN editor, household info, sign out
+10.├── css/
+11.   └── style.css           # Shared design system (tokens, layouts, components)
+   │
+12.└── js/
+13. |  ─ supabase.js         # Supabase client initialisation
+14. └── auth.js             # requireAuth() and signOut() helpers
 *Figure 7 — Repository Structure*
 
 ### 7.2 Technology Stack
