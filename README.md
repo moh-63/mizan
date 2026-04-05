@@ -8,7 +8,9 @@
 5.ZEYAD GARWAN, 230513395, Username: ZeyadGarwan
 
 ## Project Introduction
-A concise summary of the project and the problem it solves.
+**Mizan** is a shared expense tracker for roommates and small groups. It lets users log shared expenses, automatically splits costs among household members, and calculates who owes whom, eliminating the awkward mental math and back-and-forth that comes with splitting bills.
+
+Simply add an expense, choose who's involved, and Mizan handles the rest, keeping everyone on the same page until it's time to settle up.
 
 ## Architecture Link
 [Architecture Documentation](Architecture.md)
