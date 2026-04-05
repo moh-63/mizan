@@ -186,6 +186,7 @@ The system is organised into four logical layers:
 
 
 ER DIAGRAM HEERE -----------------------------------------------------------------------------------
+<img width="596" height="668" alt="Screenshot 2026-04-05 at 11 20 05 am" src="https://github.com/user-attachments/assets/5f6d2fa6-696e-4028-9e6b-4d43096473e7" />
 
 
 
