@@ -5,10 +5,6 @@
 
 ---
 
-## Change History
-
-to be filled with git history
----
 
 ## Table of Contents
 
@@ -531,7 +527,7 @@ The Scenarios (Use Case) view illustrates the architecture through the most sign
 **Precondition:** At least one expense exists in the household
 
 **Main Flow:**
-1. User taps "Expenses" in the bottom navigation → `expense_history.html`
+1. User taps "Expenses" in the bottom navigation → `history.html`
 2. System loads all expenses, exclusions, and member names
 3. Stat cards show total amount and user's computed share
 4. Month dropdown is auto-populated from actual expense dates
