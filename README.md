@@ -1,4 +1,4 @@
-# Project Title
+# Mizan (ميزان) 
 
 ## Team Details
 1.Mohammed Alhamed, 230513625, Username: moh-63
