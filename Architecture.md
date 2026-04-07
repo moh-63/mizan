@@ -546,7 +546,6 @@ The Scenarios (Use Case) view illustrates the architecture through the most sign
 
 | Asset | Description |
 |-------|-------------|
-| 9 HTML pages | Average ~300 lines each; total ~2,700 lines of HTML |
 | 1 shared CSS file | ~750 lines covering the full design system |
 | 2 shared JS files | ~30 lines combined (client init + auth helpers) |
 | 0 dependencies | No npm packages, no bundler, no build step |
@@ -570,7 +569,6 @@ Mizan is designed for **household-scale use**:
 - Up to a few hundred expenses over the household's lifetime
 - No expected concurrent user load beyond the household group
 - Users: 10 – 1,000 total users
-- 
 No caching, pagination, or query optimisation is required at this scale.
 
 ---
