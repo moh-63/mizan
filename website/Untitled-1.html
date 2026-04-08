@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Expense History</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body { background: var(--color-bg); }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 24px 73.5px 0;
+      flex-shrink: 0;
+    }
+
+    .page-header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .page-header__title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--color-text-heading);
+    }
+
+    .page-header__sub {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    .add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      padding: 0 16px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .add-btn:hover { background: var(--color-primary-hover); text-decoration: none; }
+    .add-btn svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* ── Content ── */
+    .page-content {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 32px 24px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ── Stat cards ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card__label { font-size: 14px; color: var(--color-text-muted); line-height: 20px; }
+    .stat-card__value { font-family: var(--font-display); font-size: 30px; line-height: 36px; color: var(--color-text-heading); }
+    .stat-card__sub   { font-size: 14px; color: var(--color-text-muted); line-height: 20px; }
+
+    /* ── Filter panel ── */
+    .filter-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 17px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Search + sort row */
+    .filter-row-1 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--color-text-muted);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 36px;
+      padding: 4px 12px 4px 36px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-body);
+      background: var(--color-surface);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-input::placeholder { color: var(--color-text-muted); }
+    .search-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+
+    .sort-select {
+      height: 36px;
+      padding: 0 12px;
+      padding-right: 28px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      background: var(--color-surface);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b5a8e' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sort-select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+
+    /* Category filter chips */
+    .cat-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cat-chip {
+      height: 32px;
+      padding: 0 13px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .cat-chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .cat-chip.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    /* Month row */
+    .filter-row-3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-row-3 label {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .month-select {
+      height: 36px;
+      padding: 0 12px;
+      padding-right: 28px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      background: var(--color-surface);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b5a8e' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      width: 200px;
+    }
+    .month-select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+
+    /* ── Expense list ── */
+    .expense-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .expense-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .expense-row:last-child { border-bottom: none; }
+
+    .expense-row__left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .expense-row__emoji { font-size: 30px; line-height: 36px; flex-shrink: 0; }
+
+    .expense-row__desc {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-heading);
+      line-height: 24px;
+    }
+
+    .expense-row__tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .cat-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 3px 9px;
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--color-primary);
+      white-space: nowrap;
+    }
+
+    .expense-row__date { font-size: 14px; color: var(--color-text-muted); }
+
+    .expense-row__meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .expense-row__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .expense-row__total { font-size: 16px; font-weight: 500; color: var(--color-text-heading); line-height: 24px; }
+    .expense-row__split { font-size: 14px; color: var(--color-text-muted); }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-red);
+      cursor: pointer;
+      padding: 2px 0;
+    }
+    .delete-btn:hover { text-decoration: underline; }
+
+    /* ── Empty / no-results ── */
+    .empty {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Delete modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.1);
+      width: 448px;
+      max-width: 100%;
+      padding: 24px;
+      position: relative;
+      transform: translateY(12px) scale(0.98);
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease;
+      opacity: 0;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+
+    .modal__close {
+      position: absolute; top: 16px; right: 16px;
+      width: 24px; height: 24px;
+      background: none; border: none; cursor: pointer;
+      opacity: 0.5; display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; transition: opacity 0.15s; padding: 0;
+    }
+    .modal__close:hover { opacity: 1; }
+    .modal__close svg { width: 16px; height: 16px; stroke: var(--color-text-heading); fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    .modal__body { display: flex; flex-direction: column; gap: 20px; }
+
+    .modal__warning-icon {
+      display: flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--color-error-bg); margin: 0 auto 4px;
+    }
+    .modal__warning-icon svg { width: 28px; height: 28px; stroke: var(--color-error-text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .modal__delete-title { font-family: var(--font-display); font-weight: 600; font-size: 22px; line-height: 30px; color: var(--color-text-heading); text-align: center; }
+    .modal__delete-desc { font-size: 14px; line-height: 20px; color: var(--color-text-muted); text-align: center; }
+    .modal__delete-expense-name { font-weight: 600; color: var(--color-text-heading); }
+
+    .modal__delete-btn {
+      width: 100%; height: 36px;
+      background: var(--color-red); color: #fff;
+      border: none; border-radius: var(--radius-btn);
+      font-family: var(--font-body); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.15s, opacity 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .modal__delete-btn:hover:not(:disabled) { background: #b91c1c; }
+    .modal__delete-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .modal__delete-btn .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+    .modal__delete-btn.loading .spinner   { display: block; }
+    .modal__delete-btn.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal__cancel-btn {
+      width: 100%; height: 36px; background: transparent; border: none;
+      font-family: var(--font-body); font-size: 14px; font-weight: 500;
+      color: var(--color-text-heading); cursor: pointer; border-radius: var(--radius-btn);
+      transition: background 0.15s;
+    }
+    .modal__cancel-btn:hover { background: rgba(0,0,0,0.04); }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 81px; background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      display: flex; align-items: center; z-index: 100;
+    }
+    .bottom-nav__inner {
+      width: 100%; max-width: 1143px; margin: 0 auto;
+      padding: 0 59.5px; display: flex; align-items: center; justify-content: space-around;
+    }
+    .nav-link {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 16px; color: var(--color-text-muted); text-decoration: none;
+      font-size: 12px; border-radius: 12px; transition: color 0.15s;
+    }
+    .nav-link svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-link:hover { text-decoration: none; color: var(--color-primary); }
+    .nav-link.active { color: var(--color-primary); background: rgba(124,58,237,0.1); }
+    .nav-add { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; font-size: 12px; color: var(--color-primary); }
+    .nav-add__icon { width: 44px; height: 44px; background: var(--color-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124,58,237,0.4); margin-top: -8px; }
+    .nav-add__icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 16px 16px 0; }
+      .page-content { padding: 24px 16px 100px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .bottom-nav__inner { padding: 0 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div>
+        <div class="page-header__title">Expense History</div>
+        <div id="householdSub" class="page-header__sub">Loading…</div>
+      </div>
+      <a href="add-expense.html" class="add-btn">
+        <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+        Add Expense
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Content ── -->
+  <main class="page-content">
+
+    <!-- Stat cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card__label">Total expenses</div>
+        <div id="statTotal" class="stat-card__value">SAR —</div>
+        <div id="statCount" class="stat-card__sub">— expenses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Your share</div>
+        <div id="statShare" class="stat-card__value">SAR —</div>
+        <div class="stat-card__sub">From filtered expenses</div>
+      </div>
+    </div>
+
+    <!-- Filter panel -->
+    <div class="filter-panel">
+      <!-- Search + sort -->
+      <div class="filter-row-1">
+        <div class="search-wrap">
+          <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          <input id="searchInput" class="search-input" type="text" placeholder="Search expenses, people, or categories..." />
+        </div>
+        <select id="sortSelect" class="sort-select">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="highest">Highest amount</option>
+          <option value="lowest">Lowest amount</option>
+        </select>
+      </div>
+
+      <!-- Category filters -->
+      <div class="cat-filter-row" id="catFilters">
+        <button class="cat-chip active" data-cat="all">All</button>
+        <button class="cat-chip" data-cat="food">🍎 Food</button>
+        <button class="cat-chip" data-cat="utilities">⚡ Utilities</button>
+        <button class="cat-chip" data-cat="cleaning">🧹 Cleaning</button>
+        <button class="cat-chip" data-cat="fun">🎉 Fun</button>
+        <button class="cat-chip" data-cat="home">🏠 Home</button>
+        <button class="cat-chip" data-cat="transport">🚗 Transport</button>
+        <button class="cat-chip" data-cat="health">💊 Health</button>
+        <button class="cat-chip" data-cat="other">📦 Other</button>
+      </div>
+
+      <!-- Month filter -->
+      <div class="filter-row-3">
+        <label for="monthSelect">Month:</label>
+        <select id="monthSelect" class="month-select">
+          <option value="all">All months</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Expense list -->
+    <div class="expense-panel" id="expenseList">
+      <div class="empty">Loading expenses…</div>
+    </div>
+
+  </main>
+
+  <!-- ── Bottom Nav ── -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav__inner">
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 20 20"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+        Home
+      </a>
+      <a href="expense_history.html" class="nav-link active">
+        <svg viewBox="0 0 20 20"><rect x="4" y="2" width="12" height="16" rx="1"/><line x1="7" y1="7" x2="13" y2="7"/><line x1="7" y1="10" x2="13" y2="10"/><line x1="7" y1="13" x2="10" y2="13"/></svg>
+        Expenses
+      </a>
+      <a href="add-expense.html" class="nav-add">
+        <div class="nav-add__icon">
+          <svg viewBox="0 0 22 22"><line x1="11" y1="3" x2="11" y2="19"/><line x1="3" y1="11" x2="19" y2="11"/></svg>
+        </div>
+        <span>Add</span>
+      </a>
+      <a href="profile.html" class="nav-link">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="6" r="3"/><path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7"/></svg>
+        Profile
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Delete Modal ── -->
+  <div id="deleteOverlay" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <button class="modal__close" id="deleteCloseBtn">
+        <svg viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+      </button>
+      <div class="modal__body">
+        <div class="modal__warning-icon">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="modal__delete-title">Delete expense?</div>
+          <div class="modal__delete-desc" style="margin-top:8px">
+            Are you sure you want to delete <span class="modal__delete-expense-name" id="deleteExpenseName">this expense</span>?
+            This will remove it for everyone in your household and cannot be undone.
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="modal__delete-btn" id="confirmDeleteBtn" type="button">
+            <span class="spinner"></span>
+            <span class="btn-label">Yes, delete it</span>
+          </button>
+          <button class="modal__cancel-btn" id="deleteCancelBtn" type="button">Keep it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    // ── Helpers ────────────────────────────────────────────
+    const CATEGORY_EMOJI = { food:'🍎', utilities:'⚡', cleaning:'🧹', home:'🏠', fun:'🎉', transport:'🚗', health:'💊', other:'📦' };
+
+    function sar(n) {
+      return 'SAR ' + Number(n).toLocaleString('en-SA', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function sarFixed(n) {
+      return 'SAR ' + Number(n).toLocaleString('en-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-SA', { month: 'short', day: 'numeric' });
+    }
+
+    function monthKey(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function monthLabel(key) {
+      const [y, m] = key.split('-');
+      return new Date(Number(y), Number(m)-1, 1).toLocaleDateString('en-SA', { month: 'long', year: 'numeric' });
+    }
+
+    function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
+
+    // ── State ──────────────────────────────────────────────
+    let allExpenses    = [];
+    let exclusionMap   = {};
+    let memberMap      = {};
+    let currentUserId  = null;
+    let activeCat      = 'all';
+    let activeMonth    = 'all';
+    let searchQuery    = '';
+    let sortOrder      = 'newest';
+
+    // ── DOM ────────────────────────────────────────────────
+    const expenseList   = document.getElementById('expenseList');
+    const searchInput   = document.getElementById('searchInput');
+    const sortSelect    = document.getElementById('sortSelect');
+    const monthSelect   = document.getElementById('monthSelect');
+    const catFilters    = document.getElementById('catFilters');
+    const statTotal     = document.getElementById('statTotal');
+    const statCount     = document.getElementById('statCount');
+    const statShare     = document.getElementById('statShare');
+
+    // ── Filtering + rendering ──────────────────────────────
+    function getFiltered() {
+      let list = [...allExpenses];
+
+      // Category
+      if (activeCat !== 'all') {
+        list = list.filter(e => (e.category || '').toLowerCase() === activeCat);
+      }
+
+      // Month
+      if (activeMonth !== 'all') {
+        list = list.filter(e => monthKey(e.created_at) === activeMonth);
+      }
+
+      // Search
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        list = list.filter(e => {
+          const paidByName = (memberMap[e.paid_by] || '').toLowerCase();
+          return (
+            e.description.toLowerCase().includes(q) ||
+            (e.category || '').toLowerCase().includes(q) ||
+            paidByName.includes(q)
+          );
+        });
+      }
+
+      // Sort
+      list.sort((a, b) => {
+        if (sortOrder === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+        if (sortOrder === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+        if (sortOrder === 'highest') return b.amount - a.amount;
+        if (sortOrder === 'lowest')  return a.amount - b.amount;
+        return 0;
+      });
+
+      return list;
+    }
+
+    function renderExpenses() {
+      const filtered = getFiltered();
+
+      // Update stats
+      const totalAmount = filtered.reduce((s, e) => s + e.amount, 0);
+      let myShare = 0;
+      filtered.forEach(e => {
+        const excluded = exclusionMap[e.id] || new Set();
+        const participants = Object.keys(memberMap).filter(id => !excluded.has(id));
+        if (participants.length > 0 && participants.includes(currentUserId)) {
+          myShare += e.amount / participants.length;
+        }
+      });
+
+      statTotal.textContent = sar(totalAmount);
+      statCount.textContent = `${filtered.length} expense${filtered.length !== 1 ? 's' : ''}`;
+      statShare.textContent = sarFixed(myShare);
+
+      if (filtered.length === 0) {
+        expenseList.innerHTML = '<div class="empty">No expenses match your filters.</div>';
+        return;
+      }
+
+      expenseList.innerHTML = filtered.map(exp => {
+        const excluded     = exclusionMap[exp.id] || new Set();
+        const participants = Object.keys(memberMap).filter(id => !excluded.has(id));
+        const share        = participants.length > 0 ? exp.amount / participants.length : 0;
+        const splitCount   = participants.length;
+        const paidByName   = memberMap[exp.paid_by] || 'Someone';
+        const isMine       = exp.paid_by === currentUserId;
+        const emoji        = CATEGORY_EMOJI[(exp.category||'').toLowerCase()] || '📦';
+        const catLabel     = capitalize(exp.category) || 'Other';
+
+        const deleteBtn = isMine
+          ? `<button class="delete-btn" data-id="${exp.id}" data-desc="${exp.description.replace(/"/g,'&quot;')}" onclick="openDelete(this)">Delete</button>`
+          : '';
+
+        return `
+          <div class="expense-row" id="exp-${exp.id}">
+            <div class="expense-row__left">
+              <span class="expense-row__emoji">${emoji}</span>
+              <div>
+                <div class="expense-row__desc">${exp.description}</div>
+                <div class="expense-row__tags">
+                  <span class="cat-badge">${catLabel}</span>
+                  <span class="expense-row__date">${formatDate(exp.created_at)}</span>
+                </div>
+                <div class="expense-row__meta">
+                  <span>Paid by ${paidByName}</span>
+                  <span>•</span>
+                  <span>Split ${splitCount} way${splitCount !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+            </div>
+            <div class="expense-row__right">
+              <div class="expense-row__total">${sar(exp.amount)}</div>
+              <div class="expense-row__split">${sarFixed(share)} each</div>
+              ${deleteBtn}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Category chips ─────────────────────────────────────
+    catFilters.addEventListener('click', e => {
+      const btn = e.target.closest('.cat-chip');
+      if (!btn) return;
+      catFilters.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      renderExpenses();
+    });
+
+    // ── Search ─────────────────────────────────────────────
+    searchInput.addEventListener('input', () => {
+      searchQuery = searchInput.value.trim();
+      renderExpenses();
+    });
+
+    // ── Sort ───────────────────────────────────────────────
+    sortSelect.addEventListener('change', () => {
+      sortOrder = sortSelect.value;
+      renderExpenses();
+    });
+
+    // ── Month ──────────────────────────────────────────────
+    monthSelect.addEventListener('change', () => {
+      activeMonth = monthSelect.value;
+      renderExpenses();
+    });
+
+    // ── Delete modal ───────────────────────────────────────
+    const deleteOverlay   = document.getElementById('deleteOverlay');
+    const deleteCloseBtn  = document.getElementById('deleteCloseBtn');
+    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+    const confirmDeleteBtn= document.getElementById('confirmDeleteBtn');
+    const deleteNameEl    = document.getElementById('deleteExpenseName');
+
+    let pendingDeleteId = null;
+
+    function openDelete(btn) {
+      pendingDeleteId = btn.dataset.id;
+      deleteNameEl.textContent = `"${btn.dataset.desc}"`;
+      deleteOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDelete() {
+      deleteOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+      confirmDeleteBtn.classList.remove('loading');
+      confirmDeleteBtn.disabled = false;
+      pendingDeleteId = null;
+    }
+
+    deleteOverlay.addEventListener('click', e => { if (e.target === deleteOverlay) closeDelete(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDelete(); });
+    deleteCloseBtn.addEventListener('click', closeDelete);
+    deleteCancelBtn.addEventListener('click', closeDelete);
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+      if (!pendingDeleteId) return;
+      confirmDeleteBtn.classList.add('loading');
+      confirmDeleteBtn.disabled = true;
+
+      const { error } = await sb.from('expenses').delete().eq('id', pendingDeleteId);
+
+      if (error) {
+        alert('Could not delete: ' + error.message);
+        confirmDeleteBtn.classList.remove('loading');
+        confirmDeleteBtn.disabled = false;
+        return;
+      }
+
+      // Remove from local array and re-render (no page reload needed)
+      allExpenses = allExpenses.filter(e => e.id !== pendingDeleteId);
+      closeDelete();
+      renderExpenses();
+    });
+
+    // ── Boot ───────────────────────────────────────────────
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+      currentUserId = session.user.id;
+
+      // Profile + household
+      const { data: profile } = await sb
+        .from('users')
+        .select('household_id')
+        .eq('id', currentUserId)
+        .single();
+
+      if (!profile?.household_id) { window.location.href = 'household.html'; return; }
+      const householdId = profile.household_id;
+
+      // Household name
+      const { data: household } = await sb
+        .from('households')
+        .select('name')
+        .eq('id', householdId)
+        .single();
+      document.getElementById('householdSub').textContent = household?.name || '';
+
+      // Members
+      const { data: members } = await sb
+        .from('users')
+        .select('id, full_name')
+        .eq('household_id', householdId);
+      (members || []).forEach(m => { memberMap[m.id] = m.full_name; });
+
+      // All expenses
+      const { data: expenses } = await sb
+        .from('expenses')
+        .select('id, paid_by, description, amount, category, created_at')
+        .eq('household_id', householdId)
+        .order('created_at', { ascending: false });
+      allExpenses = expenses || [];
+
+      // Exclusions
+      const { data: exclusions } = await sb
+        .from('expense_exclusions')
+        .select('expense_id, user_id');
+      (exclusions || []).forEach(ex => {
+        if (!exclusionMap[ex.expense_id]) exclusionMap[ex.expense_id] = new Set();
+        exclusionMap[ex.expense_id].add(ex.user_id);
+      });
+
+      // Build month dropdown from actual expense dates
+      const months = [...new Set(allExpenses.map(e => monthKey(e.created_at)))]
+        .sort((a, b) => b.localeCompare(a));
+
+      months.forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = monthLabel(key);
+        monthSelect.appendChild(opt);
+      });
+
+      renderExpenses();
+    })();
+  </script>
+
+</body>
+</html>
