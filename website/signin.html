@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Create Account</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+
+  <!-- the stylesheet should have been enough, but for some reason this is the only page that doesnt work properly unless i manually set proportions :) -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #fafaff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid rgba(124, 58, 237, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.1);
+      width: 448px;
+      padding: 33px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card-header { display: flex; flex-direction: column; gap: 8px; text-align: center; }
+
+    .card-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 36px;
+      color: #1a0f2e;
+    }
+
+    .card-header p {
+      font-size: 14px;
+      line-height: 20px;
+      color: #6b5a8e;
+    }
+
+    .form { display: flex; flex-direction: column; gap: 16px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .field label {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 14px;
+      color: #1a0f2e;
+    }
+
+    .field input {
+      height: 36px;
+      padding: 4px 12px;
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #1a0f2e;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+
+    .field input::placeholder { color: #6b5a8e; }
+
+    .field input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    }
+
+    .field-hint {
+      font-size: 12px;
+      line-height: 16px;
+      color: #6b5a8e;
+    }
+
+    .btn-primary {
+      height: 36px;
+      width: 100%;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: #6d28d9; }
+    .btn-primary:active:not(:disabled) { background: #5b21b6; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: block; }
+    .btn-primary.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .card-footer {
+      text-align: center;
+      font-size: 14px;
+      line-height: 20px;
+      color: #6b5a8e;
+    }
+    .card-footer a { color: #7c3aed; text-decoration: none; font-weight: 500; }
+    .card-footer a:hover { text-decoration: underline; }
+
+    .banner {
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 18px;
+      display: none;
+    }
+    .banner.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .banner.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .banner.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <div class="card-header">
+      <h1>Create your account</h1>
+      <p>Start tracking household expenses</p>
+    </div>
+
+    <div id="banner" class="banner" role="alert"></div>
+
+    <div class="form">
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <input id="fullName" type="text" placeholder="Enter your full name" autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="your@email.com" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Create a password" autocomplete="new-password" />
+      </div>
+
+      <div class="field">
+        <label for="iban">IBAN</label>
+        <input id="iban" type="text" placeholder="SA00 0000 0000 0000 0000 0000" autocomplete="off" />
+        <span class="field-hint">Used when roommates need to settle up with you</span>
+      </div>
+
+      <button id="submitBtn" class="btn-primary" type="button">
+        <span class="spinner"></span>
+        <span class="btn-label">Create account</span>
+      </button>
+    </div>
+
+    <div class="card-footer">
+      Already have an account? <a href="signin.html">Sign in</a>
+    </div>
+
+  </div>
+
+  <!-- Load Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0"></script>
+
+<!-- Then load Supabase client initialization -->
+<script src="js/supabase.js"></script>
+
+<!-- Then load app scripts that use sb -->
+<script src="js/auth.js"></script>
+
+  <script>
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput    = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const ibanInput     = document.getElementById('iban');
+    const submitBtn     = document.getElementById('submitBtn');
+    const banner        = document.getElementById('banner');
+
+    function showError(msg) {
+      banner.textContent = msg;
+      banner.className = 'banner error visible';
+    }
+    function showSuccess(msg) {
+      banner.textContent = msg;
+      banner.className = 'banner success visible';
+    }
+    function hideBanner() {
+      banner.className = 'banner';
+    }
+
+    // format IBAN with spaces every 4 characters
+    ibanInput.addEventListener('input', () => {
+      let raw = ibanInput.value.replace(/\s+/g, '').toUpperCase();
+      ibanInput.value = raw.match(/.{1,4}/g)?.join(' ') ?? raw;
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      hideBanner();
+
+      const fullName = fullNameInput.value.trim();
+      const email    = emailInput.value.trim();
+      const password = passwordInput.value;
+      const iban     = ibanInput.value.replace(/\s+/g, ''); // store without spaces
+
+      if (!fullName) return showError('Please enter your full name.');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return showError('Please enter a valid email address.');
+      if (password.length < 8)
+        return showError('Password must be at least 8 characters.');
+      if (!iban) return showError('Please enter your IBAN.');
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        // 1. Create auth user
+        const { data: authData, error: authError } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
+
+        if (authError) throw authError;
+
+        const userId = authData.user?.id;
+        if (!userId) throw new Error('Sign-up succeeded but no user ID returned.');
+
+        // 2. Insert into public.users
+        const { error: profileError } = await sb
+          .from('users')
+          .insert({
+            id:        userId,
+            full_name: fullName,
+            email:     email,
+            iban:      iban
+          });
+
+        if (profileError) throw profileError;
+
+        showSuccess('Account created! Redirecting…');
+        setTimeout(() => {
+          window.location.href = 'household.html';
+        }, 1500);
+
+      } catch (err) {
+        showError(err.message ?? 'Something went wrong. Please try again.');
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+
+    // makes enter key work to submit
+    [fullNameInput, emailInput, passwordInput, ibanInput].forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') submitBtn.click(); });
+    });
+
+    // Redirect logged in users
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) window.location.href = 'dashboard.html';
+    })();
+  </script>
+
+</body>
+</html>
