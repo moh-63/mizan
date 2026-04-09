@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mizan — Profile</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body { background: var(--color-bg); }
+
+    /* header style */
+    .page-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      height: 81px;
+      display: flex;
+      align-items: center;
+      padding: 0 235.5px;
+      flex-shrink: 0;
+    }
+
+    .page-header__title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--color-text-heading);
+    }
+
+    /* main content area */
+    .page-content {
+      max-width: 672px;
+      margin: 0 auto;
+      padding: 32px 24px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* cards style */
+    .profile-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 25px;
+    }
+
+    /* user info row */
+    .identity-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* user avatar circle */
+    .profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 400;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- page header -->
+  <header class="page-header">
+    <h1 class="page-header__title">Profile</h1>
+  </header>
+
+  <!-- main content -->
+  <main class="page-content">
+
+    <!-- user info card -->
+    <div class="profile-card">
+      <div class="identity-row">
+        <div id="avatar" class="profile-avatar">?</div>
+        <div>
+          <div id="profileName" class="identity-name">Loading…</div>
+          <div id="profileEmail" class="identity-email"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    let currentUserId  = null;
+    let inviteCode     = null;
+
+    // get elements from page
+    const avatarEl      = document.getElementById('avatar');
+    const profileName   = document.getElementById('profileName');
+    const profileEmail  = document.getElementById('profileEmail');
+
+    // show message to user
+    function showBanner(el, type, msg) {
+      el.textContent = msg;
+      el.className = `inline-banner ${type}`;
+      setTimeout(() => { el.className = 'inline-banner'; }, 3000);
+    }
+
+    // convert date to readable format
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-SA', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    // run when page loads
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'signin.html'; return; }
+
+      currentUserId = session.user.id;
+
+      // get user info from database
+      const { data: profile } = await sb
+        .from('users')
+        .select('full_name, email')
+        .eq('id', currentUserId)
+        .single();
+
+      if (!profile) { window.location.href = 'signin.html'; return; }
+
+      // show user info on screen
+      const firstName = profile.full_name?.split(' ')[0] || '?';
+      avatarEl.textContent = firstName[0].toUpperCase();
+      profileName.textContent = profile.full_name || '—';
+      profileEmail.textContent = profile.email || '—';
+    })();
+  </script>
+
+</body>
+</html>
