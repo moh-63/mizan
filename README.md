@@ -16,4 +16,4 @@ Simply add an expense, choose who's involved, and Mizan handles the rest, keepin
 [Architecture Documentation](Architecture.md)
 
 ## Website Link
-[**Mizan**](mizan-tau.vercel.app)
+[**Mizan**]([mizan-tau.vercel.app](https://mizan-tau.vercel.app/dashboard.html))
