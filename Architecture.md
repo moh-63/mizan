@@ -147,21 +147,9 @@ The Logical View describes how the system is functionally decomposed and how its
 ### 5.1 Layer Decomposition
 
 The system is organised into four logical layers:
-┌─────────────────────────────────────────────────────────┐
-│              Layer 1 — Presentation Layer               │
-│  index.html  signup.html  signin.html  household.html   │
-│  household-join.html  dashboard.html  add-expense.html  │
-│  expense_history.html  profile.html                     │
-├─────────────────────────────────────────────────────────┤
-│            Layer 2 — Shared Logic Layer                 │
-│        js/supabase.js        js/auth.js                 │
-├─────────────────────────────────────────────────────────┤
-│           Layer 3 — Data Access Layer                   │
-│              Supabase JavaScript SDK v2                 │
-├─────────────────────────────────────────────────────────┤
-│             Layer 4 — Database Layer                    │
-│    PostgreSQL via Supabase (with RLS enforcement)       │
-└─────────────────────────────────────────────────────────┘
+
+<img width="5534" height="4900" alt="HTML Presentation Layer Flow-2026-04-09-145543" src="https://github.com/user-attachments/assets/3f122313-e5ef-44e9-b233-2bad8ff2e8cf" />
+
 
 **Layer 1 — Presentation Layer:** Each HTML page handles one screen. Pages are responsible for rendering, user interaction, local state, and calling the data access layer.
 
@@ -198,20 +186,9 @@ The system is organised into four logical layers:
 
 Balances are **never stored**. The net balance between two users is computed at runtime using this model:
 For each expense E:
-participants = all_household_members − excluded_members(E)
-share = E.amount / len(participants)
-if E.paid_by == me:
-for each p in participants where p ≠ me:
-balance[p] += share        # p owes me
-elif me in participants:
-balance[E.paid_by] -= share  # I owe the payer
-For each settlement S:
-if S.payer_id == me:
-balance[S.payee_id] += S.amount
-elif S.payee_id == me:
-balance[S.payer_id] -= S.amount
-Result: balance[uid] > 0 → uid owes me
-balance[uid] < 0 → I owe uid
+
+<img width="6572" height="2365" alt="HTML Presentation Layer Flow-2026-04-09-151054" src="https://github.com/user-attachments/assets/557b9b85-156c-4eec-bdfb-57e9628ce001" />
+
 *Figure 5 — Balance Calculation Algorithm*
 
 ---
@@ -230,51 +207,22 @@ Two processes are active at runtime:
 There is no application server process.
 
 ### 6.2 Sign-Up Flow
-Browser                    Supabase Auth              PostgreSQL
-│                             │                        │
-│── signUp(email, password) ──►│                        │
-│◄── JWT + user.id ───────────│                        │
-│                             │                        │
-│── INSERT INTO users ────────────────────────────────►│
-│    (id, full_name,          │                        │
-│     email, iban)            │                        │
-│◄── success ────────────────────────────────────────  │
-│                             │                        │
-│── redirect to household.html
+
+<img width="3730" height="2355" alt="HTML Presentation Layer Flow-2026-04-09-151548" src="https://github.com/user-attachments/assets/86e44b05-40d2-4336-bb89-69bcadc90470" />
+
 *Figure 3 — Sign-Up Sequence Diagram*
 
 ### 6.3 Add Expense Flow
-Browser                                  PostgreSQL
-│                                          │
-│── INSERT INTO expenses ─────────────────►│
-│    (household_id, paid_by,               │
-│     description, amount, category)       │
-│◄── {id: new_expense_id} ────────────────-│
-│                                          │
-│── INSERT INTO expense_exclusions ───────►│  (if any)
-│    (expense_id, user_id) × N             │
-│◄── success ─────────────────────────────-│
-│                                          │
-│── redirect to dashboard.html
+
+<img width="2995" height="1585" alt="HTML Presentation Layer Flow-2026-04-09-151834" src="https://github.com/user-attachments/assets/b4603667-4cb8-4fc0-bbf6-3ac4ec7188cf" />
+
+
 *Figure 4 — Add Expense Sequence Diagram*
 
 ### 6.4 Settle Flow
-Browser                                  PostgreSQL
-│                                          │
-│  [User clicks Settle]                    │
-│── SELECT iban FROM users ───────────────►│
-│    WHERE id = payee_id                   │
-│◄── {iban: "SA..."} ─────────────────────-│
-│                                          │
-│  [Modal shows IBAN; user makes bank transfer manually]
-│                                          │
-│  [User clicks "Mark as settled"]         │
-│── INSERT INTO settlements ──────────────►│
-│    (payer_id, payee_id, amount,          │
-│     settled_at)                          │
-│◄── success ─────────────────────────────-│
-│                                          │
-│── loadDashboard() [recalculate balances]
+
+<img width="4245" height="2455" alt="HTML Presentation Layer Flow-2026-04-09-152134" src="https://github.com/user-attachments/assets/f0b80cfb-a438-4ac3-a434-6d373844165c" />
+
 *Figure 6 — Settle Flow Sequence Diagram*
 
 ### 6.5 Concurrency Model
@@ -288,6 +236,7 @@ Mizan has no application server, so there is no traditional concurrency concern.
 The Development View describes the static organisation of the codebase, the tech stack, and how the system is built and deployed.
 
 ### 7.1 Repository Structure
+```
 mizan/
 1. ├── index.html              # Landing page — CTA + redirect for logged-in users
 2. ├── signup.html             # Registration form
@@ -304,6 +253,7 @@ mizan/
 12.└── js/
 13. |  ─ supabase.js         # Supabase client initialisation
 14. └── auth.js             # requireAuth() and signOut() helpers
+```
 *Figure 7 — Repository Structure*
 
 ### 7.2 Technology Stack
@@ -383,8 +333,7 @@ The Physical View describes how software components map to infrastructure.
 ### 8.1 Infrastructure Overview
 
 
-<img width="1250" height="558" alt="System_Architecture drawio" src="https://github.com/user-attachments/assets/2ad82d77-26b9-4695-be87-26f48fe4b2ee" />
-
+<img width="5543" height="2926" alt="HTML Presentation Layer Flow-2026-04-09-154057" src="https://github.com/user-attachments/assets/d3feb99e-88b3-4ac2-92a3-98ec7a11b878" />
 
 
 *Figure 9 — Physical Infrastructure Diagram*
@@ -398,17 +347,9 @@ The Physical View describes how software components map to infrastructure.
 | **Supabase** | Auth + Database + API | Managed PostgreSQL + PostgREST + JWT Auth |
 
 ### 8.3 Deployment Pipeline
-Developer → git push → GitHub (main)
-│
-webhook trigger
-│
-Vercel
-│
-copy static files
-│
-CDN distribution
-│
-live at project URL
+
+<img width="400" height="1200" alt="HTML Presentation Layer Flow-2026-04-09-154439" src="https://github.com/user-attachments/assets/e9f14492-24ff-44f7-87a2-02e413c2d9bd" />
+
 *Figure 8 — Deployment Pipeline*
 
 No build step is required. Vercel serves `.html`, `.css`, and `.js` files directly. A new deployment is live within seconds of a push.
