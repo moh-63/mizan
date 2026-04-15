@@ -307,60 +307,6 @@ The Scenarios (Use Case) view illustrates the architecture through the most sign
 
 **Postcondition:** User has browsed history with filters applied; optional deletion recorded
 
-
-
-## Appendices
-
-### Acronyms and Abbreviations
-
-| Acronym | Expansion |
-|---------|-----------|
-| CDN | Content Delivery Network |
-| CSS | Cascading Style Sheets |
-| DB | Database |
-| ERD | Entity Relationship Diagram |
-| FK | Foreign Key |
-| HTML | HyperText Markup Language |
-| IBAN | International Bank Account Number |
-| JS | JavaScript |
-| JWT | JSON Web Token |
-| PK | Primary Key |
-| RLS | Row Level Security |
-| SAD | Software Architecture Document |
-| SQL | Structured Query Language |
-| UC | Use Case |
-
-### Definitions
-
-| Term | Definition |
-|------|-----------|
-| **Balance** | The net amount of money owed between two household members, computed at runtime from expenses, exclusions, and settlements |
-| **Expense** | A shared cost paid by one household member on behalf of some or all members |
-| **Exclusion** | A record indicating that a specific member did not participate in a given expense and should not be charged their share |
-| **Household** | A group of users sharing a Mizan account, identified by a unique invite code |
-| **Invite code** | A 6-character alphanumeric code used to add new members to a household |
-| **Settlement** | A recorded manual bank transfer that reduces or eliminates a debt between two household members |
-| **Payer** | The member who paid for an expense on behalf of the group |
-| **PostgREST** | An open-source server that provides a RESTful API automatically from a PostgreSQL schema |
-| **Supabase** | An open-source Firebase alternative providing PostgreSQL, Auth, and a PostgREST API |
-| **Vercel** | A cloud platform for static site hosting and edge CDN distribution |
-
-### Design Principles
-
-The following principles guided all architectural and implementation decisions:
-
-1. **Runtime truth over stored derivations** — Balances are computed fresh from raw data on every load. No derived or cached values are stored that could become inconsistent with the source records.
-
-2. **Enforce security at the database, not the client** — All access control is implemented as PostgreSQL RLS policies. Client code is never trusted to enforce data isolation.
-
-3. **One source of truth for shared concerns** — Design tokens live in `css/style.css`; the Supabase client lives in `js/supabase.js`; auth helpers live in `js/auth.js`. No duplication across pages.
-
-4. **No build step unless necessary** — Keeping the stack at plain HTML/CSS/JS eliminates toolchain complexity, speeds up iteration, and makes the project accessible to all team members.
-
-5. **Fail visibly, recover gracefully** — All async operations show loading states, display user-facing error messages on failure, and leave the UI in a consistent state. No silent failures.
-
-6. **Scope discipline** — Features outside the core household-expense use case (payment processing, real-time sync, multi-household) were deliberately excluded to deliver a complete, working product within the 6-week timeline.
-
 ---
 
 ## 10. Size and Performance
@@ -436,3 +382,57 @@ No caching, pagination, or query optimisation is required at this scale.
 | Empty states | All lists show friendly messages when empty |
 
 ---
+
+## Appendices
+
+### Acronyms and Abbreviations
+
+| Acronym | Expansion |
+|---------|-----------|
+| CDN | Content Delivery Network |
+| CSS | Cascading Style Sheets |
+| DB | Database |
+| ERD | Entity Relationship Diagram |
+| FK | Foreign Key |
+| HTML | HyperText Markup Language |
+| IBAN | International Bank Account Number |
+| JS | JavaScript |
+| JWT | JSON Web Token |
+| PK | Primary Key |
+| RLS | Row Level Security |
+| SAD | Software Architecture Document |
+| SQL | Structured Query Language |
+| UC | Use Case |
+
+### Definitions
+
+| Term | Definition |
+|------|-----------|
+| **Balance** | The net amount of money owed between two household members, computed at runtime from expenses, exclusions, and settlements |
+| **Expense** | A shared cost paid by one household member on behalf of some or all members |
+| **Exclusion** | A record indicating that a specific member did not participate in a given expense and should not be charged their share |
+| **Household** | A group of users sharing a Mizan account, identified by a unique invite code |
+| **Invite code** | A 6-character alphanumeric code used to add new members to a household |
+| **Settlement** | A recorded manual bank transfer that reduces or eliminates a debt between two household members |
+| **Payer** | The member who paid for an expense on behalf of the group |
+| **PostgREST** | An open-source server that provides a RESTful API automatically from a PostgreSQL schema |
+| **Supabase** | An open-source Firebase alternative providing PostgreSQL, Auth, and a PostgREST API |
+| **Vercel** | A cloud platform for static site hosting and edge CDN distribution |
+
+### Design Principles
+
+The following principles guided all architectural and implementation decisions:
+
+1. **Runtime truth over stored derivations** — Balances are computed fresh from raw data on every load. No derived or cached values are stored that could become inconsistent with the source records.
+
+2. **Enforce security at the database, not the client** — All access control is implemented as PostgreSQL RLS policies. Client code is never trusted to enforce data isolation.
+
+3. **One source of truth for shared concerns** — Design tokens live in `css/style.css`; the Supabase client lives in `js/supabase.js`; auth helpers live in `js/auth.js`. No duplication across pages.
+
+4. **No build step unless necessary** — Keeping the stack at plain HTML/CSS/JS eliminates toolchain complexity, speeds up iteration, and makes the project accessible to all team members.
+
+5. **Fail visibly, recover gracefully** — All async operations show loading states, display user-facing error messages on failure, and leave the UI in a consistent state. No silent failures.
+
+6. **Scope discipline** — Features outside the core household-expense use case (payment processing, real-time sync, multi-household) were deliberately excluded to deliver a complete, working product within the 6-week timeline.
+
+
