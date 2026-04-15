@@ -360,3 +360,79 @@ The following principles guided all architectural and implementation decisions:
 5. **Fail visibly, recover gracefully** — All async operations show loading states, display user-facing error messages on failure, and leave the UI in a consistent state. No silent failures.
 
 6. **Scope discipline** — Features outside the core household-expense use case (payment processing, real-time sync, multi-household) were deliberately excluded to deliver a complete, working product within the 6-week timeline.
+
+---
+
+## 10. Size and Performance
+
+### 10.1 Codebase Size
+
+| Asset | Description |
+|-------|-------------|
+| 1 shared CSS file | ~750 lines covering the full design system |
+| 2 shared JS files | ~30 lines combined (client init + auth helpers) |
+| 0 dependencies | No npm packages, no bundler, no build step |
+| Total payload per page | ~30–60 KB (HTML + shared CSS + Supabase CDN) |
+
+### 10.2 Performance Characteristics
+
+| Aspect | Approach |
+|--------|----------|
+| Time to first paint | Fast — static HTML served from Vercel CDN edge nodes globally |
+| Database queries per dashboard load | 6 sequential queries (profile, household, members, expenses, exclusions, settlements) |
+| Balance calculation | O(E × M) where E = expenses, M = members — runs in-browser, negligible at household scale |
+| Client-side filtering | O(N) — operates on in-memory array; no additional DB queries on filter change |
+| No caching layer | Fresh data loaded on every page load; acceptable for a household-scale application |
+
+### 10.3 Scale Assumptions
+
+Mizan is designed for household-scale use:
+
+- 2–10 members per household
+- Up to a few hundred expenses over the household's lifetime
+- No expected concurrent user load beyond the household group
+- Users: 10 – 1,000 total users
+No caching, pagination, or query optimisation is required at this scale.
+
+---
+
+## 11. Quality
+
+### 11.1 Security
+
+| Attribute | Implementation |
+|-----------|----------------|
+| Authentication | Supabase Auth — bcrypt passwords, JWT sessions, no custom auth code |
+| Authorisation | PostgreSQL RLS — enforced at DB level on every query regardless of client |
+| Transport security | HTTPS enforced by both Vercel and Supabase |
+| Password storage | Passwords never stored in public.users — managed by Supabase Auth only |
+| Invite code security | 6-char code, unambiguous charset, 7-day expiry |
+
+### 11.2 Reliability
+
+| Attribute | Implementation |
+|-----------|----------------|
+| Data consistency | Balances computed from raw records at runtime — no derived data to become inconsistent |
+| Error handling | All Supabase calls wrapped in try/catch; errors displayed via inline banners |
+| RLS enforcement | All five tables have RLS enabled; no table has public access |
+| Auth guard | Every page checks session on load and redirects if unauthenticated |
+
+### 11.3 Maintainability
+
+| Attribute | Implementation |
+|-----------|----------------|
+| Design tokens | All colours, fonts, radii, and shadows defined once in css/style.css as CSS custom properties |
+| Shared logic | Auth helpers and Supabase client defined once, imported by all pages |
+| No framework churn | Vanilla JS requires no dependency updates or framework migrations |
+| Consistent conventions | All pages follow the same script loading order, auth check pattern, and rendering approach |
+
+### 11.4 Usability
+
+| Attribute | Implementation |
+|-----------|----------------|
+| Mobile support | Responsive layouts using CSS Grid and flexbox; tested on iOS Safari |
+| Accessibility | Semantic HTML elements, ARIA roles on modals, keyboard navigation (Enter to submit, Escape to close) |
+| Feedback | Loading spinners on all async actions; success/error banners on all mutations |
+| Empty states | All lists show friendly messages when empty |
+
+---
