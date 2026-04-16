@@ -38,7 +38,39 @@
 | Figure 8 | Physical Infrastructure Diagram |
 
 ---
+## 1. Scope
 
+### 1.1 Purpose
+
+This document describes the software architecture of **Mizan** (Arabic: ميزان, meaning "balance"), a shared household expense tracker for roommates. It applies the **4+1 Architectural View Model** (Kruchten, 1995) to present the system from five complementary perspectives: Logical, Process, Development, Physical, and Scenarios.
+
+### 1.2 System Overview
+
+Mizan enables groups of roommates to:
+
+- Track shared household expenses across multiple categories
+- Calculate running net balances between members at runtime
+- Settle debts via IBAN-based manual bank transfers
+- Manage household membership through invite codes
+- View, filter, search, and manage expense history
+
+### 1.3 Intended Audience
+
+| Audience | Relevant Sections |
+|----------|-------------------|
+| Developers | §3, §5, §7 |
+| System / DevOps | §8 |
+| Product / QA | §4, §9, §11 |
+| Stakeholders | §1, §3, §4, §10 |
+
+### 1.4 Out of Scope
+
+- Automated payment processing or payment gateway integration
+- Real-time synchronisation between browser sessions
+- Mobile native applications (iOS / Android)
+- Multi-household support per user account
+
+---
 
 
 ## 2. References
@@ -54,7 +86,58 @@
 
 ---
 
+## 5. Logical Architecture
 
+The Logical View describes how the system is functionally decomposed and how its data is structured. It is most relevant to developers and end users.
+
+### 5.1 Layer Decomposition
+
+The system is organised into four logical layers:
+
+<img width="5534" height="4900" alt="HTML Presentation Layer Flow-2026-04-09-145543" src="https://github.com/user-attachments/assets/3f122313-e5ef-44e9-b233-2bad8ff2e8cf" />
+
+
+**Layer 1 — Presentation Layer:** Each HTML page handles one screen. Pages are responsible for rendering, user interaction, local state, and calling the data access layer.
+
+**Layer 2 — Shared Logic Layer:**
+- `js/supabase.js` — Initialises the Supabase client. Single source of truth for the project URL and anon key.
+- `js/auth.js` — Provides `requireAuth()` (redirect if unauthenticated) and `signOut()` (clear session and redirect) helpers used across all pages.
+
+**Layer 3 — Data Access Layer:** The Supabase JS SDK translates method calls into HTTP requests to the PostgREST API and Auth API.
+
+**Layer 4 — Database Layer:** PostgreSQL with five core tables, all protected by RLS policies. No stored procedures or triggers are used.
+
+### 5.2 Entity Relationship Diagram
+
+
+
+
+
+<img width="1924" height="518" alt="ER_Diagram" src="https://github.com/user-attachments/assets/4c015ca3-36dd-436f-a7b8-6e370fa145b9" />
+
+
+*Figure 2 — Entity Relationship Diagram*
+
+### 5.3 Data Model Reference
+
+| Table | Key Columns | Purpose |
+|-------|-------------|---------|
+| `users` | id, full_name, email, iban, household_id | Stores user profiles; id matches Supabase Auth UID |
+| `households` | id, name, invite_code, invite_expires_at | Groups users into a shared household |
+| `expenses` | id, household_id, paid_by, description, amount, category | Records a shared expense paid by one member |
+| `expense_exclusions` | expense_id, user_id | Marks members who did not participate in an expense |
+| `settlements` | payer_id, payee_id, amount, settled_at | Records that a debt has been manually settled |
+
+### 5.4 Balance Calculation Model
+
+Balances are **never stored**. The net balance between two users is computed at runtime using this model:
+For each expense E:
+
+<img width="6572" height="2365" alt="HTML Presentation Layer Flow-2026-04-09-151054" src="https://github.com/user-attachments/assets/557b9b85-156c-4eec-bdfb-57e9628ce001" />
+
+*Figure 5 — Balance Calculation Algorithm*
+
+---
 
 
 
