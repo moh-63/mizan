@@ -85,6 +85,42 @@ Mizan enables groups of roommates to:
 | Figma Design File | (https://www.figma.com/design/5SBe7HBIG1r4e95GMiPpPD/Mizan-UI-Frames?m=auto&t=3zatxUNPwl2I7H6T-1) |
 
 ---
+---
+
+## 4. Architectural Goals & Constraints
+
+### 4.1 Goals
+
+| Goal | Description |
+|------|-------------|
+| *Simplicity* | No build tools, no frameworks, no package managers — any developer can open and edit any file |
+| *Security* | Row Level Security enforces data isolation at the database level regardless of client code |
+| *Correctness* | Balances are always computed fresh from raw data — no derived values stored that could become stale |
+| *Deployability* | Auto-deploy on every GitHub push; no manual deployment steps |
+| *Usability* | Mobile-first, fast-loading, works in any modern browser without installation |
+
+### 4.2 Constraints
+
+| Constraint | Rationale |
+|------------|-----------|
+| Vanilla HTML/CSS/JS only — no frameworks | Team skill level; beginner-friendly codebase |
+| No payment gateway | Scope and complexity; IBAN + manual transfer is sufficient |
+| No real-time sync | No WebSocket usage; users refresh manually to see others' changes |
+| Supabase anon key in client code | Acceptable because RLS enforces all access control at DB level |
+| 6-week delivery timeline | Academic project deadline |
+
+
+### 4.3 Key Design Decisions
+
+| Decision | Chosen Approach | Alternative Considered | Rationale |
+|----------|-----------------|------------------------|-----------|
+| Balance storage | Calculated at runtime | Stored in DB | Avoids stale data; ensures consistency at all times |
+| Settle mechanism | IBAN display + manual transfer | Payment gateway | Simpler, no third-party fees, appropriate for small groups |
+| Membership model | household_id FK on users | Separate household_members junction table | Simpler schema; one user belongs to one household |
+| Auth | Supabase Auth (JWT) | Custom auth with bcrypt | Eliminates custom auth logic entirely |
+| Frontend | Vanilla JS | React / Vue | Matches team skill level; no build step needed |
+
+---
 
 ## 5. Logical Architecture
 
