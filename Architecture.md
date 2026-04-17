@@ -85,6 +85,24 @@ Mizan enables groups of roommates to:
 | Figma Design File | (https://www.figma.com/design/5SBe7HBIG1r4e95GMiPpPD/Mizan-UI-Frames?m=auto&t=3zatxUNPwl2I7H6T-1) |
 
 ---
+
+## 3. Software Architecture
+
+### 3.1 Overview
+
+Mizan is a **serverless, client-rendered web application**. There is no custom application server. All pages are static HTML/CSS/JS files served from a CDN (Vercel), and all backend functionality — authentication, database queries, and security enforcement — is provided by Supabase as a managed service.
+
+
+
+### 3.2 Architectural Style
+
+The architecture follows a **thin-client, serverless** style:
+
+- **No application server** — business logic runs in the browser
+- **Direct database access** — via Supabase PostgREST with RLS enforcement
+- **Static hosting** — no build step; files served as-is from Vercel CDN
+- **JWT-based authentication** — sessions managed by Supabase Auth
+
 ---
 
 ## 4. Architectural Goals & Constraints
@@ -174,9 +192,43 @@ For each expense E:
 *Figure 5 — Balance Calculation Algorithm*
 
 ---
+## 6. Process Architecture
+
+The Process View describes the runtime behaviour of the system — the dynamic flows between components.
+
+### 6.1 Runtime Processes
+
+Two processes are active at runtime:
+
+1. **Browser process** — Executes HTML/CSS/JS. Handles rendering, user interaction, local state, and all business logic (balance calculation, client-side filtering/sorting).
+2. **Supabase cloud services** — Hosts PostgreSQL, PostgREST API, and Auth. Managed service; no custom server code.
+
+There is no application server process.
+
+### 6.2 Sign-Up Flow
+
+<img width="3730" height="2355" alt="HTML Presentation Layer Flow-2026-04-09-151548" src="https://github.com/user-attachments/assets/86e44b05-40d2-4336-bb89-69bcadc90470" />
+
+*Figure 3 — Sign-Up Sequence Diagram*
+
+### 6.3 Add Expense Flow
+
+<img width="2995" height="1585" alt="HTML Presentation Layer Flow-2026-04-09-151834" src="https://github.com/user-attachments/assets/b4603667-4cb8-4fc0-bbf6-3ac4ec7188cf" />
 
 
+*Figure 4 — Add Expense Sequence Diagram*
 
+### 6.4 Settle Flow
+
+<img width="4245" height="2455" alt="HTML Presentation Layer Flow-2026-04-09-152134" src="https://github.com/user-attachments/assets/f0b80cfb-a438-4ac3-a434-6d373844165c" />
+
+*Figure 6 — Settle Flow Sequence Diagram*
+
+### 6.5 Concurrency Model
+
+Mizan has no application server, so there is no traditional concurrency concern. The PostgREST API handles concurrent requests from multiple users independently at the database level. PostgreSQL's transaction isolation prevents data corruption. However, **there is no real-time synchronisation** between browser sessions — a page reload is required to see changes made by other household members.
+
+---
 
 ## 7. Development Architecture
 
