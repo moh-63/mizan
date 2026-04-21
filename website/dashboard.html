@@ -874,14 +874,14 @@
     function sar(amount) {
       return 'SAR ' + Math.abs(amount).toLocaleString('en-SA', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
-
+      // this decides header message depending on user local time!
     function greeting() {
       const h = new Date().getHours();
       if (h < 12) return 'Good morning';
       if (h < 17) return 'Good afternoon';
       return 'Good evening';
     }
-
+    //   key/value dictionary, makes filtering and looking up specefics easier
     function categoryEmoji(cat) {
       const map = { food:'🍎', utilities:'⚡', cleaning:'🧹', home:'🏠', fun:'🎉', transport:'🚗', health:'💊', other:'📦' };
       return map[(cat||'').toLowerCase()] || '📦';
@@ -890,7 +890,7 @@
     function formatDate(iso) {
       return new Date(iso).toLocaleDateString('en-SA', { month: 'short', day: 'numeric' });
     }
-
+      //returns first letter of user's name as capital, used for icons
     function getInitial(name) {
       return (name || '?')[0].toUpperCase();
     }
@@ -899,7 +899,7 @@
     // Main load
     // ─────────────────────────────────────────────────────────
     (async () => {
-      // 1. Auth check
+      // 1. Checks for session, if no session then redirect to sign-in
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = 'signin.html'; return; }
       const me = session.user;
@@ -921,7 +921,7 @@
       // Expose current user id to settle modal
       settleSessionId = me.id;
 
-      // 3. Greeting
+      // 3. splits full name by space, calls function for greeting
       document.getElementById('greeting').textContent =
         `${greeting()}, ${myProfile.full_name.split(' ')[0]}.`;
 
@@ -954,7 +954,7 @@
       const { data: exclusions } = await sb
         .from('expense_exclusions')
         .select('expense_id, user_id');
-
+        // this checks for exclusions on every expense, and makes a set containing excluded users for each specefic expense unless empty
       const exclusionMap = {};
       (exclusions || []).forEach(ex => {
         if (!exclusionMap[ex.expense_id]) exclusionMap[ex.expense_id] = new Set();
@@ -967,7 +967,7 @@
         .select('expense_id, payer_id, payee_id, amount');
 
       // ── Runtime balance calculation ────────────────────────
-      // balances[userId] = net amount relative to me
+      // balances[userId] = my net balance with that specific user
       //   positive = they owe me
       //   negative = I owe them
       const balances = {};
@@ -1077,10 +1077,11 @@
           const isMine = exp.paid_by === me.id;
           const emoji = categoryEmoji(exp.category);
 
+          // if an expense is mine, shows a delete option
           const deleteBtn = isMine
             ? `<button class="delete-btn" data-id="${exp.id}" data-desc="${exp.description.replace(/"/g, '&quot;')}" onclick="deleteExpense(this)">Delete</button>`
             : '';
-
+          // format of how expense is shown
           return `
             <div class="expense-row" id="exp-${exp.id}">
               <div class="expense-row__left">
@@ -1297,7 +1298,7 @@
         closeModal();
         // Reload to reflect updated balances
         window.location.reload();
-
+        
       } catch (err) {
         alert('Could not record settlement: ' + err.message);
         modalMarkBtn.classList.remove('loading');
