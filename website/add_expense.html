@@ -540,8 +540,8 @@
         // 2. Insert exclusions (members who are excluded)
         if (excludedIds.size > 0) {
           const exclusions = [...excludedIds].map(uid => ({
-            expense_id: expense.id,
-            user_id:    uid,
+            expenses_id: expense.id,
+            users_id:    uid,
           }));
 
           const { error: exclErr } = await sb

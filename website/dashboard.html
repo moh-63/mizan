@@ -953,12 +953,12 @@
       // 7. Load all exclusions
       const { data: exclusions } = await sb
         .from('expense_exclusions')
-        .select('expense_id, user_id');
+        .select('expenses_id, users_id');
         // this checks for exclusions on every expense, and makes a set containing excluded users for each specefic expense unless empty
       const exclusionMap = {};
       (exclusions || []).forEach(ex => {
-        if (!exclusionMap[ex.expense_id]) exclusionMap[ex.expense_id] = new Set();
-        exclusionMap[ex.expense_id].add(ex.user_id);
+        if (!exclusionMap[ex.expenses_id]) exclusionMap[ex.expenses_id] = new Set();
+        exclusionMap[ex.expenses_id].add(ex.users_id);
       });
 
       // 8. Load all settlements
