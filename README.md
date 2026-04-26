@@ -1,11 +1,12 @@
 # Mizan (ميزان) 
 
-## GitHub Repo Link
+## Relevant Links
 
-[**Repository**](https://github.com/moh-63/mizan)
+1. Github [**Repository**](https://github.com/moh-63/mizan) 
+2. Youtube [**Demo**](https://www.youtube.com/watch?v=SFYCgl7Q9ag)
 
 ## Team Details
-Group No: 20
+### Group No: 20
 1. Mohammed Alhamed, 230513625, Username: moh-63  
 2. Mohammed Bteibt, 230513407, Username: mohammadbteibt  
 3. SADEQ ALSUFYANI, 220513432, Username: sadeeq2111  
